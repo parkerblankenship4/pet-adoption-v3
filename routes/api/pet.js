@@ -1,9 +1,15 @@
 const debug = require('debug')('app:routes:api:pet');
 const debugError = require('debug')('app:error');
 const express = require('express');
-const { nanoid } = require('nanoid');
-const dbModule = require('../../database');
-const { newId } = require('../../database');
+
+const {
+  newId,
+  findAllPets,
+  findPetById,
+  insertOnePet,
+  updateOnePet,
+  deleteOnePet,
+} = require('../../database');
 
 // const petsArray = [
 //   { _id: '1', name: 'Fido', createdDate: new Date() },
@@ -18,7 +24,7 @@ const router = express.Router();
 router.get('/list', async (req, res, next) => {
   try {
     debug('get all pets');
-    const pets = await dbModule.findAllPets();
+    const pets = await findAllPets();
     res.json(pets);
   } catch (err) {
     next(err);
@@ -29,7 +35,7 @@ router.get('/:petId', async (req, res, next) => {
     const petId = newId(req.params.petId);
     debug(`get pet ${petId}`);
 
-    const pet = await dbModule.findPetById(petId);
+    const pet = await findPetById(petId);
     if (!pet) {
       res.status(404).json({ error: `Pet ${petId} not found.` });
     } else {
@@ -59,7 +65,7 @@ router.put('/new', async (req, res, next) => {
     } else if (!pet.gender) {
       res.status(400).json({ error: 'Gender required.' });
     } else {
-      await dbModule.insertOnePet(pet);
+      await insertOnePet(pet);
       res.json({ message: 'Pet inserted.' });
     }
   } catch (err) {
@@ -72,11 +78,11 @@ router.put('/:petId', async (req, res, next) => {
     const update = req.body;
     debug(`update pet ${petId}`, update);
 
-    const pet = await dbModule.findPetById(petId);
+    const pet = await findPetById(petId);
     if (!pet) {
       res.status(404).json({ error: `Pet ${petId} not found.` });
     } else {
-      await dbModule.updateOnePet(petId, update);
+      await updateOnePet(petId, update);
       res.json({ message: `Pet ${petId} updated.` });
     }
   } catch (err) {
@@ -88,11 +94,11 @@ router.delete('/:petId', async (req, res, next) => {
     const petId = newId(req.params.petId);
     debug(`delete pet ${petId}`);
 
-    const pet = await dbModule.findPetById(petId);
+    const pet = await findPetById(petId);
     if (!pet) {
       res.status(404).json({ error: `Pet ${petId} not found.` });
     } else {
-      await dbModule.deleteOnePet(petId);
+      await deleteOnePet(petId);
       res.json({ message: `Pet ${petId} deleted.` });
     }
   } catch (err) {
