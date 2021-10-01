@@ -1,5 +1,5 @@
 const debug = require('debug')('app:database');
-const { MongoClient, ObjectId } = require('mongodb');
+const { MongoClient, ObjectId, Db } = require('mongodb');
 const config = require('config');
 
 const newId = (str) => ObjectId(str);
